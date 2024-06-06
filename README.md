@@ -29,4 +29,32 @@ After compile, execute the binary:
 ./speed
 ```
 
-You should get t
+You should get output like this:
+
+```bash
+Total devices found:4
+
+[ Device 0: NVIDIA GeForce RTX 4090]
+
+Copied 1024 MiB from GPU 0 to GPU 1 in 88.3087 ms
+Copied 1024 MiB from GPU 0 to GPU 2 in 87.0562 ms
+Copied 1024 MiB from GPU 0 to GPU 3 in 98.5456 ms
+
+[ Device 1: NVIDIA GeForce RTX 4090]
+
+Copied 1024 MiB from GPU 1 to GPU 0 in 98.5968 ms
+Copied 1024 MiB from GPU 1 to GPU 2 in 87.6707 ms
+Copied 1024 MiB from GPU 1 to GPU 3 in 96.4554 ms
+
+[ Device 2: NVIDIA GeForce RTX 4090]
+
+Copied 1024 MiB from GPU 2 to GPU 0 in 88.5677 ms
+Copied 1024 MiB from GPU 2 to GPU 1 in 88.7254 ms
+Copied 1024 MiB from GPU 2 to GPU 3 in 96.4843 ms
+
+[ Device 3: NVIDIA GeForce RTX 4090]
+
+Copied 1024 MiB from GPU 3 to GPU 0 in 118.64 ms
+Copied 1024 MiB from GPU 3 to GPU 1 in 96.6471 ms
+Copied 1024 MiB from GPU 3 to GPU 2 in 106.842 ms
+```
