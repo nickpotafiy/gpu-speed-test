@@ -8,11 +8,12 @@ NVCC_FLAGS = -O2 \
 LIBRARIES = -lcudart -lcurand
 
 all: $(TARGET)
+        @echo "Build is complete."
 
 $(TARGET): $(SOURCES)
-    $(NVCC) $(NVCC_FLAGS) $(SOURCES) -o $(TARGET) $(LIBRARIES)
+        $(NVCC) $(NVCC_FLAGS) $(SOURCES) -o $(TARGET) $(LIBRARIES)
 
 clean:
-    rm -f $(TARGET)
+        rm -f $(TARGET)
 
 .PHONY: all clean
