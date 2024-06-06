@@ -17,6 +17,12 @@ git clone https://github.com/nickpotafiy/gpu-speed-test.git
 cd gpu-speed-test
 ```
 
+Install CUDA and make.
+
+```bash
+sudo apt install make
+```
+
 Compile with make:
 
 ```bash
