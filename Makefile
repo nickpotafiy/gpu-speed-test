@@ -6,9 +6,13 @@ NVCC_FLAGS = -O2 \
         -gencode arch=compute_89,code=sm_89 \
         -gencode arch=compute_90,code=sm_90
 LIBRARIES = -lcudart -lcurand
+
 all: $(TARGET)
+
 $(TARGET): $(SOURCES)
-        $(NVCC) $(NVCC_FLAGS) $(SOURCES) -o $(TARGET) $(LIBRARIES)
+    $(NVCC) $(NVCC_FLAGS) $(SOURCES) -o $(TARGET) $(LIBRARIES)
+
 clean:
-        rm -f $(TARGET)
+    rm -f $(TARGET)
+
 .PHONY: all clean
