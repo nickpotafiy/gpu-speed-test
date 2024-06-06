@@ -17,7 +17,7 @@ git clone https://github.com/nickpotafiy/gpu-speed-test.git
 cd gpu-speed-test
 ```
 
-Install CUDA and make.
+Install [Nvidia CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit) and make.
 
 ```bash
 sudo apt install make
