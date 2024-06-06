@@ -32,7 +32,7 @@ After compile, execute the binary:
 You should get output like this:
 
 ```bash
-Total devices found:4
+Total devices found: 4
 
 [ Device 0: NVIDIA GeForce RTX 4090]
 

@@ -2,9 +2,9 @@ NVCC = nvcc
 TARGET = speed
 SOURCES = speed.cu
 NVCC_FLAGS = -O2 \
-             -gencode arch=compute_86,code=sm_86 \
-             -gencode arch=compute_89,code=sm_89 \
-             -gencode arch=compute_90,code=sm_90
+        -gencode arch=compute_86,code=sm_86 \
+        -gencode arch=compute_89,code=sm_89 \
+        -gencode arch=compute_90,code=sm_90
 LIBRARIES = -lcudart -lcurand
 all: $(TARGET)
 $(TARGET): $(SOURCES)
