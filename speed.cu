@@ -61,7 +61,7 @@ float* allocateTestData(int gpu, size_t size, bool fill = false) {
         curandGenerator_t gen;
         CURAND_CALL(curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT));
         CURAND_CALL(curandSetPseudoRandomGeneratorSeed(gen, 1234ULL));
-        CURAND_CALL(curandGenerateUniform(gen, data, size));
+        CURAND_CALL(curandGenerateUniform(gen, data, size * sizeof(float)));
         CURAND_CALL(curandDestroyGenerator(gen));
     }
     
@@ -85,7 +85,13 @@ void moveTestData(float* gpu1Data, float* gpu2Data, int gpuFrom, int gpuTo, size
     float milliseconds = 0;
     CUDA_CALL(cudaEventElapsedTime(&milliseconds, start, stop));
     
-    std::cout << "Copied " << ((size / 1024 / 1024) * 4) << " MiB from GPU " << gpuFrom << " to GPU " << gpuTo << " in " << milliseconds << " ms" << std::endl;
+    float sizeInBytes = size * sizeof(float);
+    float sizeInMB = sizeInBytes / (1024 * 1024);
+    float sizeInGB = sizeInMB / 1024;
+    float timeInSeconds = milliseconds / 1000.0;
+    float speedGBps = sizeInGB / timeInSeconds;
+
+    std::cout << "Copied " << (sizeInGB) << " GiB from GPU " << gpuFrom << " to GPU " << gpuTo << " in " << milliseconds << "ms (" << speedGBps << " GB/s)" << std::endl;
     
     CUDA_CALL(cudaEventDestroy(start));
     CUDA_CALL(cudaEventDestroy(stop));
@@ -94,7 +100,7 @@ void moveTestData(float* gpu1Data, float* gpu2Data, int gpuFrom, int gpuTo, size
 
 void test(int gpu0, int gpu1) {
 
-    const size_t dataSize = 1024 * 1024 * 1024 / 4;
+    const size_t dataSize = 1024 * 1024 * 1024;
 
     float* gpu0Data = allocateTestData(gpu0, dataSize, true);
     float* gpu1Data = allocateTestData(gpu1, dataSize, false);
@@ -114,7 +120,7 @@ int main() {
         return -1;
     }
 
-    std::cout << "Total devices found:" << num_devices << std::endl;
+    std::cout << "Total devices found: " << num_devices << std::endl;
     for(int i = 0; i < num_devices; i++) {
         cudaDeviceProp prop;
         cudaGetDeviceProperties(&prop, i);
