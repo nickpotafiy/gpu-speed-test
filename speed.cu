@@ -3,6 +3,7 @@
 #include <curand.h>
 #include <cuda_runtime.h>
 #include <curand_kernel.h>
+#include <string>
 
 #define CUDA_CALL(x) do { \
     cudaError_t err = (x); \
@@ -32,6 +33,14 @@
     } \
 } while(0)
 
+std::string formatDouble(double value, int precision) {
+    char buffer[100];
+    char format[10];
+    snprintf(format, sizeof(format), "%%.%df", precision);
+    snprintf(buffer, sizeof(buffer), format, value);
+    return std::string(buffer);
+}
+
 void enablePeerAccess(int gpuFrom, int gpuTo) {
     int canAccessPeer;
     CUDA_CALL(cudaDeviceCanAccessPeer(&canAccessPeer, gpuFrom, gpuTo));
@@ -55,13 +64,13 @@ void enablePeerAccess(int gpuFrom, int gpuTo) {
 float* allocateTestData(int gpu, size_t size, bool fill = false) {
     float* data = nullptr;
     CUDA_DEVICE(gpu);
-    CUDA_CALL(cudaMalloc((void**)&data, size * sizeof(float)));
+    CUDA_CALL(cudaMalloc((void**)&data, size));
     
     if(fill) {
         curandGenerator_t gen;
         CURAND_CALL(curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT));
         CURAND_CALL(curandSetPseudoRandomGeneratorSeed(gen, 1234ULL));
-        CURAND_CALL(curandGenerateUniform(gen, data, size * sizeof(float)));
+        CURAND_CALL(curandGenerateUniform(gen, data, size / sizeof(float)));
         CURAND_CALL(curandDestroyGenerator(gen));
     }
     
@@ -78,20 +87,21 @@ void moveTestData(float* gpu1Data, float* gpu2Data, int gpuFrom, int gpuTo, size
     CUDA_CALL(cudaEventCreate(&stop));
     
     CUDA_CALL(cudaEventRecord(start, 0));    
-    CUDA_CALL(cudaMemcpyPeer(gpu2Data, gpuTo, gpu1Data, gpuFrom, size * sizeof(float)));    
+    CUDA_CALL(cudaMemcpyPeer(gpu2Data, gpuTo, gpu1Data, gpuFrom, size));    
     CUDA_CALL(cudaEventRecord(stop, 0));
     CUDA_CALL(cudaEventSynchronize(stop));
     
     float milliseconds = 0;
     CUDA_CALL(cudaEventElapsedTime(&milliseconds, start, stop));
     
-    float sizeInBytes = size * sizeof(float);
-    float sizeInMB = sizeInBytes / (1024 * 1024);
+    float sizeInMB = size / (1024 * 1024);
     float sizeInGB = sizeInMB / 1024;
     float timeInSeconds = milliseconds / 1000.0;
     float speedGBps = sizeInGB / timeInSeconds;
 
-    std::cout << "Copied " << (sizeInGB) << " GiB from GPU " << gpuFrom << " to GPU " << gpuTo << " in " << milliseconds << "ms (" << speedGBps << " GB/s)" << std::endl;
+    std::cout << "Copied " << (sizeInGB) << " GiB from GPU " << gpuFrom << " to GPU " 
+        << gpuTo << " in " << formatDouble(milliseconds, 0) << "ms (" << formatDouble(speedGBps, 2)
+        << " GB/s)" << std::endl;
     
     CUDA_CALL(cudaEventDestroy(start));
     CUDA_CALL(cudaEventDestroy(stop));
@@ -118,6 +128,14 @@ int main() {
     if (num_devices == 0) {
         std::cerr << "No CUDA devices found." << std::endl;
         return -1;
+    }
+    for(int i = 0; i < num_devices; i++) {
+        try{
+            CUDA_CALL(cudaSetDevice(i));
+        }catch(std::runtime_error e) {
+            std::cerr << "Error setting device " << i << ": " << e.what() << std::endl;
+            return -1;
+        }
     }
 
     std::cout << "Total devices found: " << num_devices << std::endl;
